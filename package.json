@@ -1,0 +1,31 @@
+{
+  "name": "Web_SIS",
+  "version": "1.0.0",
+  "description": "A web version of my Student Information System using SQLite3 as my database and Nodejs / Express",
+  "main": "app.js",
+  "scripts": {
+    "start": "app.js",
+    "dev": "nodemon app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/arzekeilgarcia/Web_SIS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/arzekeilgarcia/Web_SIS/issues"
+  },
+  "homepage": "https://github.com/arzekeilgarcia/Web_SIS#readme",
+  "devDependencies": {
+    "nodemon": "^2.0.6"
+  },
+  "dependencies": {
+    "ejs": "^3.1.5",
+    "express": "^4.17.1",
+    "express-ejs": "^1.4.0",
+    "express-ejs-layouts": "^2.5.0",
+    "sqlite3": "^5.0.0"
+  }
+}
