@@ -7,86 +7,98 @@ const database = 'student_information.db';
 
 //Render Login Page
 router.get('/login', (req,res) => {
-    res.render('login');
+  res.render('login', {
+    success: ''
+  });
 });
 
 //Render Register Page
 router.get('/register', (req,res) => {
-    res.render('register');
+  res.render('register');
 });
 
 //Login
-router.post('/login', (req,res) => {
+router.post('/login', (req,res) => { 
+  const {email, password} = req.body;
+  let errors = [{msg: "Incorrect email or password"}];
+
+  //Connecting to Database
+  let db = new sqlite.Database(database);
+
+  let query = `SELECT * FROM entities WHERE email = ? AND password = ?`;
+
+  db.get(query, [email,password], (err,row) => {
+      if(err){
+          console.log(err);
+      }
+      return row
+      ? res.render('dashboard', {
+        row, 
+        success: ''
+      })
+      : res.render('login', {
+        errors,
+        success: ''
+      });
+  });
     
-    let email = req.body.email;
-    let password = req.body.password;
-
-    //Connecting to Database
-    let db = new sqlite.Database(database);
-
-    let query = `SELECT * FROM entities WHERE email = ? AND password = ?`;
-
-    db.get(query, [email,password], (err,row) => {
-        if(err){
-            console.log(err);
-        }
-        return row
-        ? res.render('dashboard', {
-          row
-        })
-        : res.render('login');
-    });
-      
-    //Closing database
-    db.close();
+  //Closing database
+  db.close();
 
 });
 
 //Register
 router.post('/register', (req, res) => {
-    const { fName, lName, email, password, password2 } = req.body;
-
-    // if (!fName || lName || !email || !password || !password2) {
-    //   res.render('register');
-    // }
-
-    // if (password != password2) {
-    //   res.render('register');
-    // }
-    
+  const { fName, lName, email, password, password2 } = req.body;
+  let errors = [];
+  if (password != password2) {
+    errors.push({msg: 'Passwords do not match'});
+  }
+  if (!fName || !lName || !email || !password || !password2) {
+    errors.push({msg: 'Please enter all fields'});
+  }
+  if(errors.length > 0){
+    res.render('register', {
+      errors
+    });
+  }
+  else{
     //Connecting to Database
     let db = new sqlite.Database(database);
 
     let query = `SELECT email FROM entities WHERE email = ?`;
 
-    let isFree = true;
+    errors.push({msg: 'this email is already in use'});
 
     db.get(query, [email], (err,row) => {
       if(err){
           console.log(err);
       }
       return row
-      ? isFree = false
-      : console.log('it is okay to use');
-    });
-
-    if(isFree && !fName && lName && !email && !password){
-      db.run(`INSERT INTO entities (fName, lName, email, password) VALUES (?,?,?,?)`, [fName,lName,email,password], (err) => {
+      ? res.render('register', {
+        errors
+      })
+      : db.run(`INSERT INTO entities (fName, lName, email, password) VALUES (?,?,?,?)`, [fName,lName,email,password], (err) => {
         if(err){
-          console.log(err);
+          return console.log(err.message);
         }
-        console.log('Inserted Successful');
+        res.render('login', {
+          success: 'Successfully Registered'
+        });
       });
-      res.render('login');
-    }
+    });
 
     //Closing database
     db.close();
+  }    
+  
 });
 
 //Logout
 router.get('/logout', (req, res) => {
-    res.redirect('/users/login');
+  res.render('login', {
+    success: 'Successfully Logged Out'
+  });
 });
 
 module.exports = router;
