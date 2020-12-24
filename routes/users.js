@@ -78,7 +78,7 @@ router.post('/register', (req, res) => {
       ? res.render('register', {
         errors
       })
-      : db.run(`INSERT INTO entities (fName, lName, email, password) VALUES (?,?,?,?)`, [fName,lName,email,password], (err) => {
+      : db.run(`INSERT INTO entities (fName, lName, email, password, statusType) VALUES (?,?,?,?, 'student')`, [fName,lName,email,password], (err) => {
         if(err){
           return console.log(err.message);
         }
